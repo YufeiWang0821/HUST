@@ -1,0 +1,14 @@
+ -- 6) 查找相似的理财客户
+--   请用一条SQL语句实现该查询：
+select pac,pbc,common,crank from(
+select pro_c_id as pac ,c0 as pbc, count(*) as common, row_number() over(partition by pro_c_id order by count(*) desc,c0) as crank
+from property,(
+    select pro_c_id as c0,pro_pif_id as f0 from property 
+    where pro_type=1 
+)a
+where pro_c_id!=c0 and pro_type=1 and f0=pro_pif_id
+group by pac,pbc
+)b
+where crank<3
+order by pac,crank;
+/*  end  of  your code  */

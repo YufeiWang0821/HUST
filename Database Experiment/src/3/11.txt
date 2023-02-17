@@ -1,0 +1,8 @@
+select c_id,c_name,ifnull(number_of_cards,0) number_of_cards
+from client left outer join(
+    select b_c_id,count(b_number) as number_of_cards
+    from bank_card
+    group by b_c_id
+)as a(b_c_id,number_of_cards)
+on c_id=b_c_id where c_name like "黄%"
+order by number_of_cards desc,c_id;

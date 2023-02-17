@@ -1,0 +1,29 @@
+ -- 1) 查询销售总额前三的理财产品
+--   请用一条SQL语句实现该查询：
+
+select * from
+(
+select
+    date_format(pro_purchase_time, "%Y") pyear,
+    rank() over (
+        partition by date_format(pro_purchase_time, "%Y") 
+        order by pro_quantity * p_amount desc
+        ) as rk,
+    p_id,
+    pro_quantity * p_amount as sumamount
+from 
+    (
+        select * 
+        from property 
+        where pro_type = 1 
+        and (date_format(pro_purchase_time, "%Y") between "2010" and "2011")
+        ) 
+    as temp
+    inner join 
+    finances_product
+    on pro_pif_id = finances_product.p_id
+)as ra_t
+where rk < 4
+
+
+/*  end  of  your code  */

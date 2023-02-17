@@ -1,0 +1,19 @@
+select c_name,c_id_card,ifnull(sum(total),0) as total_amount
+from client left outer join (
+    select pro_c_id,sum(pro_quantity*p_amount) as total
+    from property left outer join finances_product on(pro_pif_id = p_id)
+    where pro_type = 1
+    group by pro_c_id
+    union all
+    select pro_c_id,sum(pro_quantity*i_amount) as total
+    from property left outer join insurance on(pro_pif_id = i_id)
+    where pro_type = 2
+    group by pro_c_id
+    union all
+    select pro_c_id,sum(pro_quantity*f_amount) as total
+    from property left outer join fund on(pro_pif_id = f_id)
+    where pro_type = 3
+    group by pro_c_id
+) as P on (c_id = pro_c_id)
+group by c_id
+order by total_amount desc;

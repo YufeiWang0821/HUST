@@ -1,0 +1,15 @@
+-- 5) 查询任意两个客户的相同理财产品数
+--   请用一条SQL语句实现该查询：
+
+select pro_c_id1 as pro_c_id,pro_c_id2 as pro_c_id ,cnt as total_count 
+from(  
+    select pro_c_id1 ,pro_c_id as pro_c_id2 ,count(*) as cnt 
+    from (
+        select pro_c_id as pro_c_id1,pro_pif_id as pro_pif_id1 from property where pro_type=1
+    )a,property
+    where pro_c_id1 != pro_c_id and pro_pif_id = pro_pif_id1 and pro_type=1
+    group by pro_c_id1,pro_c_id2
+    having cnt>=2
+    order by pro_c_id1
+)b;
+/*  end  of  your code  */

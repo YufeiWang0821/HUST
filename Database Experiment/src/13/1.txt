@@ -1,0 +1,101 @@
+# 请将你实现flight_booking数据库的语句写在下方：
+DROP DATABASE IF EXISTS flight_booking;   
+CREATE DATABASE flight_booking;
+USE flight_booking;
+CREATE TABLE  user(
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    sex CHAR(1) NOT NULL,
+    email VARCHAR(50),
+    phone VARCHAR(30),
+    username VARCHAR(20) NOT NULL UNIQUE,
+    password CHAR(32) NOT NULL,
+    admin_tag TINYINT NOT NULL DEFAULT(0)
+);
+CREATE TABLE passenger(
+    passenger_id INT AUTO_INCREMENT PRIMARY KEY,
+    id CHAR(18) NOT NULL UNIQUE,
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    mail VARCHAR(50),
+    phone VARCHAR(20) NOT NULL,
+    sex CHAR(1) NOT NULL,
+    dob DATE
+);
+CREATE TABLE airport(
+    airport_id INT AUTO_INCREMENT PRIMARY KEY,
+    iata CHAR(3) NOT NULL UNIQUE,
+    icao CHAR(4) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
+    city VARCHAR(50),
+    country VARCHAR(50),
+    latitude DECIMAL(11,8),
+    longitude DECIMAL(11,8),
+    index(name)
+);
+
+CREATE TABLE airline(
+    airline_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
+    iata CHAR(2) NOT NULL UNIQUE,
+    airport_id int not null,
+    constraint foreign key(airport_id) references airport(airport_id)
+);
+
+CREATE TABLE airplane(
+    airplane_id INT AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    capacity SMALLINT NOT NULL,
+    identifier VARCHAR(50) NOT NULL,
+    airline_id int not null,
+    constraint foreign key(airline_id) references airline(airline_id)
+);
+
+CREATE TABLE flightschedule(
+    flight_no CHAR(8) PRIMARY KEY,
+    departure TIME NOT NULL,
+    arrival TIME NOT NULL,
+    duration SMALLINT NOT NULL,
+    monday TINYINT DEFAULT(0),
+    tuesday TINYINT DEFAULT(0),
+    wednesday TINYINT DEFAULT(0),
+    thursday TINYINT DEFAULT(0),
+    friday TINYINT DEFAULT(0),
+    saturday TINYINT DEFAULT(0),
+    sunday TINYINT DEFAULT(0),
+    airline_id int not null,
+    constraint foreign key(airline_id) references airline(airline_id),
+    `from` int not null, 
+    constraint foreign key(`from`) references airport(airport_id),
+    `to` int not null,
+    constraint foreign key(`to`) references airport(airport_id)
+);
+CREATE TABLE flight(
+    flight_id INT AUTO_INCREMENT PRIMARY KEY,
+    departure DATETIME NOT NULL,
+    arrival DATETIME NOT NULL,
+    duration SMALLINT NOT NULL,
+    airline_id int not null,
+    constraint foreign key(airline_id) references airline(airline_id),
+    airplane_id int not null,
+    constraint foreign key(airplane_id) references airplane(airplane_id),
+    flight_no char(8) not null,
+    constraint foreign key(flight_no) references flightschedule(flight_no),
+    `from` int not null, 
+    constraint foreign key(`from`) references airport(airport_id),
+    `to` int not null,
+    constraint foreign key(`to`) references airport(airport_id)
+);
+CREATE TABLE ticket(
+    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    seat CHAR(4),
+    price DECIMAL(10,2) NOT NULL,
+    flight_id int not null,
+    constraint foreign key(flight_id) references flight(flight_id),
+    passenger_id int not null,
+    constraint foreign key(passenger_id) references passenger(passenger_id),
+    user_id int not null,
+    constraint foreign key(user_id) references user(user_id)
+);
