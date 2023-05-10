@@ -1,0 +1,75 @@
+git branch -a
+git checkout lab1_3_
+代码跟踪的工具
+make cscope
+vim kernel/kernel.lds
+cat 查看文件
+git checkout lab1_2_exception 
+git merge lab1_1_syscall -m "continue to work on lab1_2"
+lab1_1
+./kernel/strap.c
+  //panic( "call do_syscall to accomplish the syscall and lab1_1 here.\n" );
+   tf->regs.a0 = do_syscall(tf->regs.a0,tf->regs.a1,tf->regs.a2,0,0,0,0,0);
+1-2
+./kernel/machine/mtrap.c
+      //panic( "call handle_illegal_instruction to accomplish illegal instruction interception for lab1_2.\n" );
+	handle_illegal_instruction();
+1-3
+./kernel/strap.c
+//panic( "lab1_3: increase g_ticks by one, and clear SIP field in sip register.\n" );
+  g_ticks++;
+  write_csr(sip, 1);
+
+2-1
+./kernel/vmm.c
+  //panic( "You have to implement user_va_to_pa (convert user va to pa) to print messages in lab2_1.\n" );
+  uint64 pa = lookup_pa(page_dir,(uint64)va);
+  if(pa==0) return NULL;
+  else {
+	pa+=((uint64)va & ((1<<PGSHIFT) -1));
+	return (void *)pa;
+	}
+2-2
+./kernel/vmm.c
+pte_t * pte = page_walk(page_dir,(uint64)va,0);
+  if(!pte) return ;
+  else {
+    free_page(pte);
+    (*pte)&PTE_V;
+  }
+2-3
+./strap.c
+ //panic( "You need to implement the operations that actually handle the page fault in lab2_3.\n" );
+      if(stval<0x000000007ffff000&& (stval > 0x7ffff000 - PGSIZE * 20))
+      {
+          uint64 pa = (uint64)alloc_page();
+      user_vm_map((pagetable_t)current->pagetable,  ROUNDDOWN(stval, PGSIZE), PGSIZE,(uint64)pa, prot_to_type(PROT_WRITE | PROT_READ, 1));
+      }
+3-1
+./kernel/process.c
+//panic( "You need to implement the code segment mapping of child in lab3_1.\n" );
+        uint64 pa = lookup_pa(parent->pagetable,parent->mapped_info[i].va);
+        user_vm_map(child->pagetable,parent->mapped_info[i].va,PGSIZE,pa,prot_to_type( PROT_WRITE | PROT_READ | PROT_EXEC, 1));
+         sprint("do_fork map code segment at pa:%lx of parent to child at va:%lx.\n", pa, parent->mapped_info[i].va);
+3-2
+./kernel/syscall.c
+//panic( "You need to implement the yield syscall in lab3_2.\n" );
+  current->status = READY;
+  insert_to_ready_queue( current );
+  schedule();
+3-2
+./kernel/syscall.c
+ //panic( "You need to implement the yield syscall in lab3_2.\n" );
+  current->status = READY;
+  insert_to_ready_queue( current );
+  schedule();
+\3-3
+./kernel/strap.c
+//panic( "You need to further implement the timer handling in lab3_3.\n" );
+  current->tick_count++;
+  if (current->tick_count >= TIME_SLICE_LEN) {
+    current->tick_count = 0;
+    current->status = READY;
+    insert_to_ready_queue( current );
+    schedule();
+  }
